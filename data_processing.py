@@ -195,3 +195,45 @@ else:
 
 print("Average passes made by forwards:", avg_passes_forwards)
 print("Average passes made by midfielders:", avg_passes_midfielders)
+print()
+
+print("Filter passengers in the first class.")
+first_class_passengers = table3.filter(lambda x: x['class'] == '1')
+
+print("Calculate the average fare for first class passengers.")
+average_fare_first_class = first_class_passengers.aggregate(lambda x: sum(x) / len(x), 'fare')
+
+print("Average fare for passengers in the first class:", average_fare_first_class)
+print()
+
+print("Filter passengers in the third class.")
+third_class_passengers = table3.filter(lambda x: x['class'] == '3')
+
+print("Calculate the average fare for third class passengers.")
+average_fare_third_class = third_class_passengers.aggregate(lambda x: sum(x) / len(x), 'fare')
+
+print("Average fare for passengers in the third class:", average_fare_third_class)
+print()
+
+print("""Query 2: Calculate the survival rate of male versus female passengers.
+Filter male passengers.""")
+male_passengers = table3.filter(lambda x: x['gender'] == 'male')
+
+print("Calculate the survival rate for male passengers.")
+if len(male_passengers.table) > 0:
+    male_survival_rate = male_passengers.aggregate(lambda x: sum(x) / len(x), 'Survived')
+else:
+    male_survival_rate = 0
+
+print("Filter female passengers.")
+female_passengers = table3.filter(lambda x: x['gender'] == 'female')
+
+print("Calculate the survival rate for female passengers.")
+if len(female_passengers.table) > 0:
+    female_survival_rate = female_passengers.aggregate(lambda x: sum(x) / len(x), 'Survived')
+else:
+    female_survival_rate = 0
+print()
+
+print("Survival rate for male passengers:", male_survival_rate)
+print("Survival rate for female passengers:", female_survival_rate)
