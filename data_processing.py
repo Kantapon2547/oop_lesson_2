@@ -48,9 +48,13 @@ class DB:
                 return table
         return None
 
-
+from itertools import product
 import copy
 
+def gen_comb_list(list_set):
+    all_combinations = list(product(*list_set))
+    result = [list(combination) for combination in all_combinations]
+    return result
 
 class Table:
     def __init__(self, table_name, table):
@@ -75,10 +79,22 @@ class Table:
                 filtered_table.table.append(item1)
         return filtered_table
 
+    def __is_float(self, element):
+        if element is None:
+            return False
+        try:
+            float(element)
+            return True
+        except ValueError:
+            return False
+
     def aggregate(self, function, aggregation_key):
         temps = []
         for item1 in self.table:
-            temps.append(float(item1[aggregation_key]))
+            if self.__is_float(item1[aggregation_key]):
+                temps.append(float(item1[aggregation_key]))
+            else:
+                temps.append(item1[aggregation_key])
         return function(temps)
 
     def select(self, attributes_list):
@@ -93,6 +109,70 @@ class Table:
 
     def __str__(self):
         return self.table_name + ':' + str(self.table)
+
+    def pivot_table(self, keys_to_pivot_list, keys_to_aggreagte_list, aggregate_func_list):
+        # First create a list of unique values for each key
+        unique_values_list = []
+
+        # Here is an example of of unique_values_list for
+        # keys_to_pivot_list = ['embarked', 'gender', 'class']
+        # unique_values_list =
+        # [['Southampton', 'Cherbourg', 'Queenstown'], ['M', 'F'], ['3', '2',
+        # '1']]
+
+        # Get the combination of unique_values_list
+        # You will make use of the function you implemented in Task 2
+
+        import combination_gen
+
+        # code that makes a call to combination_gen.gen_comb_list
+
+        # Example output:
+        # [['Southampton', 'M', '3'],
+        #  ['Cherbourg', 'M', '3'],
+        #  ...
+        #  ['Queenstown', 'F', '1']]
+
+        # code that filters each combination
+
+        # for each filter table applies the relevant aggregate functions
+        # to keys to aggregate
+        # the aggregate functions is listed in aggregate_func_list
+        # to keys to aggregate is listed in keys_to_aggreagte_list
+
+        # return a pivot table
+
+        unique_values_list = []
+
+        # Get unique values for each key in keys_to_pivot_list
+        for key in keys_to_pivot_list:
+            unique_values = list(set(item[key] for item in self.table))
+            unique_values_list.append(unique_values)
+
+        print(unique_values_list)
+
+        import combination_gen
+        combinations = combination_gen.gen_comb_list(unique_values_list)
+
+        print(combinations)
+
+        pivot_table_data = []
+
+        for combination in combinations:
+            filter_table = self
+            for i, key in enumerate(keys_to_pivot_list):
+                filter_table = filter_table.filter(lambda x: x[key] == combination[i])
+
+            pivot_key = tuple(combination)
+            pivot_table_data = []
+            for i, key in enumerate(keys_to_aggreagte_list):
+                for func in aggregate_func_list:
+                    if key in pivot_table_data:
+                        pivot_table_data.append(filter_table.select([key]))
+                    else:
+                        pivot_table_data.append(filter_table.select([key]))
+
+        return pivot_table_data
 
 
 table1 = Table('cities', cities)
